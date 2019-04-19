@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+cd ./data/match_data && { curl -O -J -L http://oracleselixir.com/gamedata/2019-spring/ ; cd -;}
