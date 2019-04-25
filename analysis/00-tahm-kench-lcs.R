@@ -1,12 +1,16 @@
+cat("\014") # Clear your console
+rm(list = ls()) #clear your environment
+
+setwd("~/projects/games-graphs")
+source(file.path(paste0(getwd(),"/header.R")))
+
 library(tidyverse)
 library(openxlsx)
 library(extrafont)
 library(ggthemr)
 ggthemr("fresh")
 
-source("R/main.R")
-
-match_data <- read_oracleselixir_match_data("data/match_data/2019-spring-match-data-OraclesElixir-2019-04-17.xlsx")
+match_data <- read_oracleselixir_match_data(paste0(DATA_ROOT, "match_data/2019-spring-match-data-OraclesElixir-2019-04-17.xlsx"))
 
 # Allows us to creat an opponent collumn for each data point
 full_schedule <- match_data %>% 
@@ -101,6 +105,11 @@ top_used_champions_plot <- top_used_champions %>%
 
 ggsave("plots/00_tahm_kench/top_used_champions.png", plot = top_used_champions_plot)
 
+tk_positions <- player_results %>% 
+  filter(champion == "Tahm Kench") %>% 
+  group_by(position) %>% 
+  summarise(total_uses = n())
+
 tk_games_used <- player_results %>% 
   filter(champion == "Tahm Kench") %>% 
   select(gameid, team, match_code)
@@ -157,14 +166,3 @@ team_tk_bans <- team_results %>%
   filter(!is.na(champion), champion == "Tahm Kench") %>% 
   group_by(opponent) %>% 
   summarise(total_bans = n())
-
-cjj_tk <- player_results %>% 
-  filter(player == "corejj") %>%
-  group_by(champion) %>% 
-  summarise(total_uses = n(),
-            wins = sum(result == 1),
-            losses = sum(result == 0),
-            avg_kills = mean(k),
-            avg_death = mean(d),
-            avg_asst = mean(a))
-
