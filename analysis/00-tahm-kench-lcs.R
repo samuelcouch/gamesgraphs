@@ -10,7 +10,7 @@ library(extrafont)
 library(ggthemr)
 ggthemr("fresh")
 
-match_data <- read_oracleselixir_match_data(paste0(DATA_ROOT, "match_data/2019-spring-match-data-OraclesElixir-2019-04-17.xlsx"))
+match_data <- read_oracleselixir_match_data(paste0(DATA_ROOT, "match_data/2019-spring-match-data-OraclesElixir-2019-05-12.xlsx"))
 
 # Allows us to creat an opponent collumn for each data point
 full_schedule <- match_data %>% 

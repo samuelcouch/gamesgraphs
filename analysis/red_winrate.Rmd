@@ -1,0 +1,50 @@
+---
+title: "red_winrate"
+author: "Sam Couch"
+date: "5/20/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r}
+cat("\014") # Clear your console
+rm(list = ls()) #clear your environment
+
+setwd("~/projects/games-graphs")
+source(file.path(paste0(getwd(),"/header.R")))
+
+library(tidyverse)
+library(openxlsx)
+library(extrafont)
+library(ggplot2)
+library(ggthemr)
+ggthemr("fresh")
+
+match_data <- read_oracleselixir_match_data(paste0(DATA_ROOT, "match_data/2019-spring-match-data-OraclesElixir-2019-05-14.xlsx"))
+```
+```{r}
+team_match_data <- match_data %>% 
+  filter(position == "TEAM")
+```
+```{r}
+patch_winrates <- team_match_data %>%
+  filter(!is.na(patchno), !is.na(gameid)) %>% 
+  mutate(gamecode = paste0(league,gameid,patchno)) %>% 
+  group_by(patchno) %>% 
+  summarise(total_games = n_distinct(gamecode), 
+            red = round(sum(result[side == "Red"])/total_games, 2),
+            blue = round(sum(result[side == "Blue"])/total_games, 2)) %>% 
+  gather(key = "side", value = "winrate", red, blue) %>% 
+  mutate(patchno = gsub("0", "", patchno))
+```
+```{r}
+ggplot(data = patch_winrates, aes(x = patchno, y = winrate, group = side)) +
+  geom_point(aes(color = side)) +
+  geom_line(aes(color = side)) +
+  scale_color_manual(values = c("#254e70", "#bf4342")) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Spring split win rate by side", subtitle = "All regions", x = "Patch Number", y = "Win rate")
+```
+
+
+
